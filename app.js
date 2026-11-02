@@ -47,9 +47,14 @@ let passForward = false;
 function showToast(text, icon = "ph-check-circle") {
   toast.innerHTML = `<i class="ph ${icon}"></i><span>${text}</span>`;
   toast.hidden = false;
+  requestAnimationFrame(() => toast.classList.add("is-visible"));
   clearTimeout(showToast._t);
+  clearTimeout(showToast._hideT);
   showToast._t = setTimeout(() => {
-    toast.hidden = true;
+    toast.classList.remove("is-visible");
+    showToast._hideT = setTimeout(() => {
+      toast.hidden = true;
+    }, prefersReducedMotion ? 0 : 220);
   }, 2400);
 }
 
@@ -96,12 +101,24 @@ function currentRoute() {
   return { name: location.hash.replace("#/", "") || "home", sharedId: null };
 }
 
+function transitionToView(renderFn) {
+  if (prefersReducedMotion) {
+    renderFn();
+    return;
+  }
+  stage.classList.add("is-transitioning");
+  setTimeout(() => {
+    renderFn();
+    requestAnimationFrame(() => stage.classList.remove("is-transitioning"));
+  }, 140);
+}
+
 function navigate(name, { replace = false } = {}) {
   passForward = false;
   const url = name === "home" ? `${location.pathname}` : `${location.pathname}#/${name}`;
   if (replace) history.replaceState({}, "", url);
   else history.pushState({}, "", url);
-  render();
+  transitionToView(render);
 }
 
 tabs.forEach((tab) => {
@@ -111,7 +128,7 @@ tabs.forEach((tab) => {
   });
 });
 
-window.addEventListener("popstate", render);
+window.addEventListener("popstate", () => transitionToView(render));
 
 // ---------- Home / reveal ----------
 
@@ -142,11 +159,15 @@ function renderIdle() {
       <button class="btn btn-primary" id="revealBtn">
         <i class="ph-bold ph-paper-plane-tilt"></i> Reveal a message
       </button>
+      <div class="hero-links">
+        <button class="btn btn-ghost" id="browseBtn"><i class="ph ph-books"></i> Or browse the gallery</button>
+      </div>
     </div>
   `;
   const bottle = document.getElementById("bottleIcon");
   const start = () => popBottle(bottle, () => revealRandom());
   document.getElementById("revealBtn").addEventListener("click", start);
+  document.getElementById("browseBtn").addEventListener("click", () => navigate("gallery"));
   bottle.addEventListener("click", start);
   bottle.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -154,6 +175,16 @@ function renderIdle() {
       start();
     }
   });
+
+  if (window.gsap && !prefersReducedMotion) {
+    gsap.from(".hero > *", {
+      opacity: 0,
+      y: 14,
+      duration: 0.5,
+      stagger: 0.08,
+      ease: "power3.out",
+    });
+  }
 }
 
 function popBottle(bottle, done) {
@@ -298,9 +329,22 @@ async function toggleLike(msg) {
   const nowLiked = getLikedIds().has(msg.id);
   btn.classList.toggle("is-liked", nowLiked);
   btn.setAttribute("aria-pressed", String(nowLiked));
-  btn.querySelector("i").className = `ph${nowLiked ? "-fill" : ""} ph-heart`;
+  const icon = btn.querySelector("i");
+  icon.className = `ph${nowLiked ? "-fill" : ""} ph-heart`;
   document.getElementById("likeCount").textContent = msg.likes_count;
   btn.disabled = false;
+
+  if (nowLiked && !prefersReducedMotion && icon.animate) {
+    icon.animate(
+      [
+        { transform: "scale(1)" },
+        { transform: "scale(1.35)", offset: 0.4 },
+        { transform: "scale(0.92)", offset: 0.7 },
+        { transform: "scale(1)" },
+      ],
+      { duration: 380, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
+    );
+  }
 }
 
 async function copyLink(id) {
@@ -328,6 +372,10 @@ async function renderGallery() {
     <div class="gallery-loading">Gathering messages&hellip;</div>
   `;
 
+  if (window.gsap && !prefersReducedMotion) {
+    gsap.from(".view-head", { opacity: 0, y: 10, duration: 0.4, ease: "power2.out" });
+  }
+
   const { data, error } = await supabase
     .from("messages")
     .select("*")
@@ -340,12 +388,14 @@ async function renderGallery() {
   }
 
   if (!data.length) {
-    stage.querySelector(".gallery-loading").replaceWith(
-      Object.assign(document.createElement("div"), {
-        className: "gallery-empty",
-        textContent: "No messages yet. Be the first to write one.",
-      })
-    );
+    const empty = document.createElement("div");
+    empty.className = "gallery-empty";
+    empty.innerHTML = `
+      <p>No messages yet. Be the first to write one.</p>
+      <button class="btn btn-primary" id="emptyWriteBtn"><i class="ph-bold ph-feather"></i> Write the first one</button>
+    `;
+    stage.querySelector(".gallery-loading").replaceWith(empty);
+    document.getElementById("emptyWriteBtn").addEventListener("click", () => navigate("write"));
     return;
   }
 
@@ -355,6 +405,7 @@ async function renderGallery() {
     .map(
       (msg) => `
       <button class="gallery-card" data-id="${msg.id}">
+        <i class="ph ph-arrow-up-right open-cue" aria-hidden="true"></i>
         <p>${escapeHtml(msg.content)}</p>
         <div class="gallery-card-meta">
           <span>${timeAgo(msg.created_at)}</span>
@@ -429,7 +480,9 @@ function renderWrite() {
   const sendBtn = document.getElementById("sendBtn");
 
   textarea.addEventListener("input", () => {
-    charCount.textContent = `${textarea.value.length} / 500`;
+    const len = textarea.value.length;
+    charCount.textContent = `${len} / 500`;
+    charCount.classList.toggle("is-warning", len > 460);
   });
 
   document.getElementById("cancelBtn").addEventListener("click", () => navigate("home"));
@@ -473,6 +526,18 @@ function renderWriteSuccess() {
   `;
   document.getElementById("toGallery").addEventListener("click", () => navigate("gallery"));
   document.getElementById("toHome").addEventListener("click", () => navigate("home"));
+
+  if (window.gsap && !prefersReducedMotion) {
+    gsap.from(".write-success i", { scale: 0.5, opacity: 0, duration: 0.5, ease: "back.out(2)" });
+    gsap.from(".write-success h2, .write-success p, .write-success .write-actions", {
+      opacity: 0,
+      y: 10,
+      duration: 0.4,
+      stagger: 0.08,
+      delay: 0.15,
+      ease: "power2.out",
+    });
+  }
 }
 
 // ---------- render dispatch ----------
