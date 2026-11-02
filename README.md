@@ -1,15 +1,34 @@
 # Message in a Bottle
 
-A tiny Supabase-backed prototype: load a random message left by a previous
-visitor, like it, share it, or cast your own message into the pool for
-someone else to find.
+A warm, typography-first encouragement board. A visitor can receive a random
+message left by a stranger (with a beautiful reveal animation), browse a
+gallery of public messages, write one of their own, share any message by
+URL, and pass one forward after reading it.
 
 ## Stack
 
-- Plain HTML / CSS / JS (no build step) — open `index.html` directly or serve
-  the folder statically
-- [Supabase](https://supabase.com) (Postgres + Realtime-less REST via
-  `supabase-js`) for storage, loaded from the `@supabase/supabase-js` CDN
+- Plain HTML / CSS / JS (no build step, no bundler) — open `index.html`
+  directly or serve the folder statically
+- [Supabase](https://supabase.com) (Postgres + REST via `supabase-js`) for
+  storage, loaded from the `@supabase/supabase-js` CDN
+- [GSAP](https://gsap.com) for the reveal animation, [Phosphor
+  Icons](https://phosphoricons.com) for iconography — both loaded from CDN
+- Playfair Display (message/display serif) + Outfit (UI sans), via Google
+  Fonts
+
+## Features
+
+1. **Receive** — "Reveal a message" fetches one random public message.
+2. **Reveal animation** — the message card scales in and the text resolves
+   from a soft blur, built with GSAP; skipped in favor of the final state
+   when `prefers-reduced-motion` is set.
+3. **Gallery** — browse the most recent public messages as typography cards
+   with a staggered scroll-in reveal (`IntersectionObserver`).
+4. **Write** — leave an encouraging message for a stranger from the Write tab.
+5. **Share** — every message has a URL (`?m=<id>`); opening that link loads
+   that specific message directly, no matter where it was shared.
+6. **Pass it forward** — after reading a message, "Pass it forward" opens the
+   write form so you can leave one of your own.
 
 ## Supabase project
 
@@ -36,8 +55,24 @@ grants what the RLS policies above allow.
 
 ## Running locally
 
-Just open `index.html` in a browser, or serve the folder:
+No install, no build step. Pick whichever you have on hand:
 
 ```bash
 npx serve .
 ```
+
+```bash
+python3 -m http.server 8080
+```
+
+Then open the printed URL (`http://localhost:3000` for `serve`, or
+`http://localhost:8080` for Python). The app talks straight to the Supabase
+project above, so there's nothing else to configure.
+
+To preview a specific message the way a shared link would open it, append
+`?m=<message-id>`, e.g. `http://localhost:8080/?m=<uuid>`.
+
+## Deployment
+
+Deployed to Vercel as a static site (no build command, no framework) from
+the `main` branch of this repo.

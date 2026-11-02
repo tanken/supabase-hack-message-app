@@ -4,46 +4,41 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Message in a Bottle</title>
+<meta name="description" content="Receive an encouraging message from a stranger, or leave one for the next person to find." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="wrap">
-    <header class="header">
-      <h1>🫙 Message in a Bottle</h1>
-      <p class="sub">A random note, left by someone, found by you.</p>
-    </header>
+  <div class="noise" aria-hidden="true"></div>
 
-    <section class="card" id="card">
-      <p class="message" id="messageText">Uncorking a bottle…</p>
-      <div class="meta">
-        <span id="timestamp"></span>
-      </div>
-      <div class="actions">
-        <button id="likeBtn" class="btn btn-like" aria-pressed="false">
-          <span class="icon">🤍</span> <span id="likeCount">0</span>
-        </button>
-        <button id="shareBtn" class="btn">
-          <span class="icon">🔗</span> Share
-        </button>
-        <button id="nextBtn" class="btn btn-primary">
-          <span class="icon">🌊</span> Next bottle
-        </button>
-      </div>
-    </section>
+  <header class="topbar">
+    <a class="brand" href="." data-nav="home">
+      <span class="brand-mark"><i class="ph-bold ph-paper-plane-tilt"></i></span>
+      <span class="brand-word">Message in a Bottle</span>
+    </a>
+    <nav class="tabs" aria-label="Primary">
+      <button class="tab is-active" data-nav="home" aria-current="page">
+        <i class="ph ph-house"></i><span>Home</span>
+      </button>
+      <button class="tab" data-nav="gallery">
+        <i class="ph ph-books"></i><span>Gallery</span>
+      </button>
+      <button class="tab" data-nav="write">
+        <i class="ph ph-feather"></i><span>Write</span>
+      </button>
+    </nav>
+  </header>
 
-    <section class="compose">
-      <h2>Drop your own message in the sea</h2>
-      <textarea id="newMessage" maxlength="500" placeholder="Leave something kind, funny, or honest for a stranger to find..."></textarea>
-      <div class="compose-row">
-        <span id="charCount" class="char-count">0 / 500</span>
-        <button id="postBtn" class="btn btn-primary">Cast it away</button>
-      </div>
-      <p id="postStatus" class="status"></p>
-    </section>
+  <main id="stage" class="stage">
+    <!-- views are rendered here by app.js -->
   </main>
 
-  <div id="toast" class="toast" hidden></div>
+  <div id="toast" class="toast" role="status" hidden></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>
