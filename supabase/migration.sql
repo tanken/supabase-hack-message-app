@@ -86,3 +86,22 @@ as $$
   where id = target_id
   returning *;
 $$;
+
+-- kindness tree stats (one round trip for the Tree view and home hero)
+create or replace function public.get_kindness_stats()
+returns json
+language sql
+stable
+set search_path = public
+as $$
+  select json_build_object(
+    'messages', count(*),
+    'likes', coalesce(sum(likes_count), 0),
+    'shares', coalesce(sum(share_count), 0),
+    'this_week', count(*) filter (where created_at > now() - interval '7 days'),
+    'today', count(*) filter (where created_at > now() - interval '1 day')
+  )
+  from public.messages;
+$$;
+
+grant execute on function public.get_kindness_stats() to anon, authenticated;
