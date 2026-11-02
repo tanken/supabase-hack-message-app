@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Message in a Bottle</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <h1>🫙 Message in a Bottle</h1>
+      <p class="sub">A random note, left by someone, found by you.</p>
+    </header>
+
+    <section class="card" id="card">
+      <p class="message" id="messageText">Uncorking a bottle…</p>
+      <div class="meta">
+        <span id="timestamp"></span>
+      </div>
+      <div class="actions">
+        <button id="likeBtn" class="btn btn-like" aria-pressed="false">
+          <span class="icon">🤍</span> <span id="likeCount">0</span>
+        </button>
+        <button id="shareBtn" class="btn">
+          <span class="icon">🔗</span> Share
+        </button>
+        <button id="nextBtn" class="btn btn-primary">
+          <span class="icon">🌊</span> Next bottle
+        </button>
+      </div>
+    </section>
+
+    <section class="compose">
+      <h2>Drop your own message in the sea</h2>
+      <textarea id="newMessage" maxlength="500" placeholder="Leave something kind, funny, or honest for a stranger to find..."></textarea>
+      <div class="compose-row">
+        <span id="charCount" class="char-count">0 / 500</span>
+        <button id="postBtn" class="btn btn-primary">Cast it away</button>
+      </div>
+      <p id="postStatus" class="status"></p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
