@@ -27,37 +27,37 @@
 :root:not([data-theme="light"]) {
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
-    --bg: #221a26;
-    --card: #2c222f;
-    --ink: #f6eee7;
-    --ink-muted: #c9bcc4;
-    --ink-faint: #8f8294;
-    --border: #3c2f40;
+    --bg: #332a3a;
+    --card: #3f3447;
+    --ink: #f8f1ea;
+    --ink-muted: #d3c6cf;
+    --ink-faint: #a699a8;
+    --border: #534757;
     --accent: #e8906b;
     --accent-hover: #f0a787;
-    --accent-soft: rgba(232, 144, 107, 0.16);
-    --accent-ghost: rgba(232, 144, 107, 0.14);
+    --accent-soft: rgba(232, 144, 107, 0.18);
+    --accent-ghost: rgba(232, 144, 107, 0.16);
     --destructive: #e08478;
-    --shadow-card: 0 24px 56px -26px rgba(0, 0, 0, 0.55);
-    --shadow-card-hover: 0 30px 64px -24px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 20px 48px -26px rgba(20, 14, 22, 0.45);
+    --shadow-card-hover: 0 26px 56px -24px rgba(20, 14, 22, 0.5);
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #221a26;
-  --card: #2c222f;
-  --ink: #f6eee7;
-  --ink-muted: #c9bcc4;
-  --ink-faint: #8f8294;
-  --border: #3c2f40;
+  --bg: #332a3a;
+  --card: #3f3447;
+  --ink: #f8f1ea;
+  --ink-muted: #d3c6cf;
+  --ink-faint: #a699a8;
+  --border: #534757;
   --accent: #e8906b;
   --accent-hover: #f0a787;
-  --accent-soft: rgba(232, 144, 107, 0.16);
-  --accent-ghost: rgba(232, 144, 107, 0.14);
+  --accent-soft: rgba(232, 144, 107, 0.18);
+  --accent-ghost: rgba(232, 144, 107, 0.16);
   --destructive: #e08478;
-  --shadow-card: 0 24px 56px -26px rgba(0, 0, 0, 0.55);
-  --shadow-card-hover: 0 30px 64px -24px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 20px 48px -26px rgba(20, 14, 22, 0.45);
+  --shadow-card-hover: 0 26px 56px -24px rgba(20, 14, 22, 0.5);
 }
 
 * {
@@ -200,10 +200,73 @@ body {
   padding-top: 8px;
 }
 
-.hero-eyebrow {
-  color: var(--accent);
-  font-size: 1.6rem;
-  line-height: 1;
+.bottle-stage {
+  position: relative;
+  width: 132px;
+  height: 184px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bottle-float {
+  width: 108px;
+  height: 160px;
+  transform-origin: 50% 90%;
+  animation: bottleFloat 4.5s ease-in-out infinite;
+  cursor: pointer;
+}
+
+.bottle-float svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.bottle-shadow {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 70px;
+  height: 14px;
+  background: var(--accent);
+  opacity: 0.16;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  filter: blur(2px);
+  animation: bottleShadow 4.5s ease-in-out infinite;
+}
+
+@keyframes bottleFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(3deg);
+  }
+}
+
+@keyframes bottleShadow {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.16;
+  }
+  50% {
+    transform: translateX(-50%) scale(0.78);
+    opacity: 0.08;
+  }
+}
+
+.bottle-float.is-popping {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottle-float,
+  .bottle-shadow {
+    animation: none;
+  }
 }
 
 .hero h1 {

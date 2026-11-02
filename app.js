@@ -115,11 +115,28 @@ window.addEventListener("popstate", render);
 
 // ---------- Home / reveal ----------
 
+const BOTTLE_SVG = `
+<svg viewBox="0 0 120 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="44" y="4" width="32" height="16" rx="5" fill="var(--accent)" />
+  <rect x="48" y="18" width="24" height="34" rx="6" stroke="var(--ink-muted)" stroke-width="3" fill="none" />
+  <path d="M48 46 C48 46 30 58 24 78 C18 98 18 118 18 132 C18 150 30 162 60 162 C90 162 102 150 102 132 C102 118 102 98 96 78 C90 58 72 46 72 46 Z" stroke="var(--ink-muted)" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <path d="M22 112 C40 104 80 104 98 112 L98 130 C98 148 86 158 60 158 C34 158 22 148 22 130 Z" fill="var(--accent)" opacity="0.18"/>
+  <g stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round">
+    <rect x="46" y="86" width="28" height="14" rx="7" fill="none" transform="rotate(-8 60 93)"/>
+    <line x1="52" y1="90" x2="68" y2="90" transform="rotate(-8 60 93)"/>
+    <line x1="52" y1="96" x2="68" y2="96" transform="rotate(-8 60 93)"/>
+  </g>
+  <path d="M32 70 C28 90 27 112 30 130" stroke="white" stroke-opacity="0.35" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+</svg>`;
+
 function renderIdle() {
   setActiveTab("home");
   stage.innerHTML = `
     <div class="hero">
-      <span class="hero-eyebrow"><i class="ph-fill ph-sparkle"></i></span>
+      <div class="bottle-stage">
+        <div class="bottle-shadow" aria-hidden="true"></div>
+        <div class="bottle-float" id="bottleIcon" role="button" tabindex="0" aria-label="Reveal a message">${BOTTLE_SVG}</div>
+      </div>
       <h1>A kind word is waiting for you.</h1>
       <p>Someone wrote this for a stranger. That stranger might be you.</p>
       <button class="btn btn-primary" id="revealBtn">
@@ -127,7 +144,29 @@ function renderIdle() {
       </button>
     </div>
   `;
-  document.getElementById("revealBtn").addEventListener("click", () => revealRandom());
+  const bottle = document.getElementById("bottleIcon");
+  const start = () => popBottle(bottle, () => revealRandom());
+  document.getElementById("revealBtn").addEventListener("click", start);
+  bottle.addEventListener("click", start);
+  bottle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      start();
+    }
+  });
+}
+
+function popBottle(bottle, done) {
+  if (!window.gsap || prefersReducedMotion) {
+    done();
+    return;
+  }
+  bottle.classList.add("is-popping");
+  gsap.timeline({ onComplete: done })
+    .to(bottle, { rotate: -10, duration: 0.08, ease: "power1.out" })
+    .to(bottle, { rotate: 8, duration: 0.1, ease: "power1.inOut" })
+    .to(bottle, { rotate: -5, scale: 1.08, duration: 0.09, ease: "power1.inOut" })
+    .to(bottle, { rotate: 0, scale: 1, y: -16, opacity: 0, duration: 0.22, ease: "power2.in" });
 }
 
 function renderLoading() {
